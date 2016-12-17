@@ -1,5 +1,6 @@
-def build_cmd(*words, flags=(), opts=(), args=(),
-              wordf='{}', flagf='-{}', optf='--{}', argf='--{}={}', **kwargs):
+def build_command(*words, flags=(), opts=(), args=(),
+                  wordf='{}', flagf='-{}', optf='--{}', argf='--{}={}',
+                  **kwargs):
     """Parse the args into a single list."""
     result = []
     result.extend(wordf.format(word) for word in words)
@@ -10,7 +11,7 @@ def build_cmd(*words, flags=(), opts=(), args=(),
     return result
 
 
-class CmdBuilder:
+class CommandBuilder:
 
     def __init__(self, *additions, cmd=(), **attrs):
         self.cmd = cmd + additions
@@ -32,7 +33,7 @@ class CmdBuilder:
         new_attrs = {name: kwargs.pop(name)
                      for name in self.__dict__
                      if name in kwargs}
-        additions = build_cmd(*args, **kwargs)
+        additions = build_command(*args, **kwargs)
         attrs = {**self.__dict__, **new_attrs}
         return self.__class__(*additions, **attrs)
 
