@@ -3,6 +3,7 @@ from contextlib import contextmanager
 
 @contextmanager
 def patch(obj, *delattrs, **setattrs):
+    """Monkey-patch an object, then restore its original attributes."""
     added = object()
     originals = {}
     try:
