@@ -46,4 +46,4 @@ class WeakValueIdentityDictionary(IdentityDict):
 
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
-        finalize(key, lambda: self._keys.pop(id(key), None))
+        finalize(value, lambda: self._keys.pop(id(key), None))
