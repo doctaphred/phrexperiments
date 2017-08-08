@@ -1,5 +1,5 @@
 from collections.abc import MutableMapping
-from weakref import finalize, WeakKeyDictionary, WeakValueDictionary
+from weakref import finalize, WeakValueDictionary
 
 
 class IdentityDict(MutableMapping):
@@ -42,7 +42,7 @@ class WeakValueIdentityDictionary(IdentityDict):
 
     def __init__(self):
         self._keys = {}
-        self._values = WeakKeyDictionary()
+        self._values = WeakValueDictionary()
 
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
