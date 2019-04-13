@@ -37,7 +37,11 @@ class Indexer:
 
         self._names[name] = obj
 
-        self._tags.setdefault(name, set()).add(name)
+        self.tag(name, [name])
+        self.tag(name, tags)
+
+    def tag(self, name, tags):
+        assert name in self._names
         for tag in tags:
             self._tags.setdefault(tag, set()).add(name)
 
