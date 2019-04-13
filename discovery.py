@@ -21,7 +21,13 @@ class Indexer:
         self._names = {}
         self._tags = {}
 
-    def add(self, obj, name, tags):
+    def add(self, obj, name=None, *, tags=()):
+        if name is None:
+            try:
+                name = obj.__name__
+            except AttributeError:
+                raise ValueError("Must provide a name")
+
         try:
             prev = self._names[name]
         except KeyError:
