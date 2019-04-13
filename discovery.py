@@ -22,9 +22,12 @@ class Indexer:
         self._tags = {}
 
     def add(self, obj, name, tags):
-        if name in self._names:
-            # TODO: allow subsequent tag additions to the same object?
-            raise ValueError(name)
+        try:
+            prev = self._names[name]
+        except KeyError:
+            pass
+        else:
+            raise ValueError(f"{prev!r} is already named {name!r}")
 
         self._names[name] = obj
 
