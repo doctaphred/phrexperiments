@@ -28,6 +28,7 @@ class Indexer:
 
         self._names[name] = obj
 
+        self._tags.setdefault(name, set()).add(name)
         for tag in tags:
             self._tags.setdefault(tag, set()).add(name)
 
