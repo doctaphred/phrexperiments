@@ -38,10 +38,10 @@ class Indexer:
             results &= self._tags[tag]
         return results
 
-    def get(self, tags):
-        return self._get(tags, self.filter(tags))
+    def get(self, tags, *, results=None):
+        if results is None:
+            results = self.filter(tags)
 
-    def _get(self, tags, results):
         if len(results) == 1:
             return self._names[results.pop()]
 
@@ -59,7 +59,7 @@ class Discoverer:
         self._matches = matches = indexer.filter(tags)
 
         try:
-            self._result = indexer._get(tags, matches)
+            self._result = indexer.get(tags, results=matches)
         except IndexerError as exc:
             self._result = None
             self._error = exc
