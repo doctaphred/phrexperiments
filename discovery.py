@@ -18,45 +18,42 @@ class MultipleResults(IndexerError):
 class Indexer:
 
     def __init__(self):
-        self._names = {}
-        self._tags = {}
+        self._obj_index = {}
+        self._tag_index = {}
 
-    def add(self, obj, name=None, *, tags=()):
-        if name is None:
-            try:
-                name = obj.__name__
-            except AttributeError:
-                raise ValueError("Must provide a name")
+    def index(self, obj, tags):
+        obj_tags = self._obj_index.setdefault(obj, set())
+
+        for tag in tags:
+            obj_tags.add(tag)
+            self._tag_index.setdefault(tag, set()).add(obj)
 
         try:
-            prev = self._names[name]
-        except KeyError:
+            name = obj.__name__
+        except AttributeError:
             pass
         else:
-            raise ValueError(f"{prev!r} is already named {name!r}")
-
-        self._names[name] = obj
-
-        self.tag(name, [name])
-        self.tag(name, tags)
-
-    def tag(self, name, tags):
-        assert name in self._names
-        for tag in tags:
-            self._tags.setdefault(tag, set()).add(name)
+            obj_tags.add(name)
+            self._tag_index.setdefault(name, set()).add(obj)
 
     def filter(self, tags):
-        results = set(self._names)
+        objects = set(self._obj_index)
         for tag in tags:
-            results &= self._tags[tag]
-        return results
+            objects &= self._tag_index[tag]
+        return objects
+
+    def filter2(self, tags):
+        return {
+            obj for obj, obj_tags in self._obj_index.items()
+            if obj_tags >= tags
+        }
 
     def get(self, tags, *, results=None):
         if results is None:
             results = self.filter(tags)
 
         if len(results) == 1:
-            return self._names[results.pop()]
+            return results.pop()
 
         if not results:
             raise NoResults(tags)
@@ -86,7 +83,7 @@ class Discoverer:
         )
 
     def __dir__(self):
-        return frozenset(self._indexer._tags) - self._tags
+        return frozenset(self._indexer._tag_index) - self._tags
 
     def __call__(self):
         if self._error is None:
@@ -207,7 +204,7 @@ if __name__ == '__main__':
     }
 
     for name, tags in ufunc_tags.items():
-        ufuncs_indexer.add(getattr(np, name), name, tags=tags)
+        ufuncs_indexer.index(getattr(np, name), tags=tags)
 
     assert ufuncs.bitwise.unary() is np.invert
     assert ufuncs.unary.bitwise() is np.invert
