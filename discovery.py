@@ -62,7 +62,7 @@ class Discoverer:
         )
 
     def __dir__(self):
-        return frozenset(self._indexer._tag_index) - self._tags
+        return self._indexer._tag_index.keys() - self._tags
 
     def __call__(self):
         objects = self._indexer.filter(self._tags)
