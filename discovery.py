@@ -217,3 +217,38 @@ if __name__ == '__main__':
     assert ufuncs.floating.binary.math() is np.fmod
     assert ufuncs.binary.floating.math() is np.fmod
     assert ufuncs.fmod() is np.fmod
+
+    extra_attrs = dir(ufuncs) - ufunc_tags.keys()
+    missing_funcs = ufunc_tags.keys() - dir(ufuncs)
+
+    assert extra_attrs == {
+        'binary',
+        'bitwise',
+        'comparison',
+        'conjugate',  # True name of conj
+        'floating',
+        'hyperbolic',
+        'inverse',
+        'math',
+        'trig',
+        'unary',
+    }, extra_attrs
+
+    # TODO: Handle aliases better
+    assert missing_funcs == {
+        'conj',  # alias of 'conjugate'
+        'divide',  # alias of 'true_divide'
+        'mod',  # alias of 'remainder'
+    }, missing_funcs
+
+    # for name in dir(np):
+    #     obj = getattr(np, name)
+    #     if isinstance(obj, np.ufunc) and name != obj.__name__:
+    #         print(name, obj)
+
+    # Prints:
+    #     abs <ufunc 'absolute'>
+    #     bitwise_not <ufunc 'invert'>
+    #     conj <ufunc 'conjugate'>
+    #     divide <ufunc 'true_divide'>
+    #     mod <ufunc 'remainder'>
