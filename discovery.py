@@ -48,33 +48,12 @@ class Indexer:
             if obj_tags >= tags
         }
 
-    def get(self, tags, *, results=None):
-        if results is None:
-            results = self.filter(tags)
-
-        if len(results) == 1:
-            return results.pop()
-
-        if not results:
-            raise NoResults(tags)
-
-        raise MultipleResults(tags, results)
-
 
 class Discoverer:
 
     def __init__(self, indexer, tags=frozenset()):
         self._indexer = indexer
         self._tags = tags
-        self._objects = objects = indexer.filter(tags)
-
-        try:
-            self._obj = indexer.get(tags, results=objects)
-        except DiscoveryError as exc:
-            self._obj = None
-            self._error = exc
-        else:
-            self._error = None
 
     def __getattr__(self, name):
         return type(self)(
@@ -86,16 +65,21 @@ class Discoverer:
         return frozenset(self._indexer._tag_index) - self._tags
 
     def __call__(self):
-        if self._error is None:
-            return self._obj
+        objects = self._indexer.filter(self._tags)
+        if not objects:
+            raise NoResults(self._tags)
+        elif len(objects) == 1:
+            return next(iter(objects))
         else:
-            raise self._error
+            raise MultipleResults(self._tags, objects)
 
     def __repr__(self):
-        if self._error is None:
-            return f"Use () to retrieve {self._obj!r}"
+        try:
+            obj = self()
+        except DiscoveryError as exc:
+            return str(exc)
         else:
-            return str(self._error)
+            return f"Use () to retrieve {obj!r}"
 
 
 if __name__ == '__main__':
