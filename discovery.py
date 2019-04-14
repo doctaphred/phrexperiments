@@ -1,17 +1,17 @@
-class IndexerError(Exception):
+class DiscoveryError(LookupError):
     pass
 
 
-class NoResults(IndexerError):
+class NoResults(DiscoveryError):
     def __init__(self, tags):
-        super().__init__(f"No results found with tags {set(tags)}")
+        super().__init__(f"No objects tagged with {set(tags)}")
 
 
-class MultipleResults(IndexerError):
-    def __init__(self, tags, results):
-        msg = f"Multiple results found with tags {set(tags)}:"
-        for result in results:
-            msg += (f"\n  - {result}")
+class MultipleResults(DiscoveryError):
+    def __init__(self, tags, objects):
+        msg = f"Multiple objects tagged with {set(tags)}:"
+        for obj in objects:
+            msg += f"\n  - {obj}"
         super().__init__(msg)
 
 
@@ -66,12 +66,12 @@ class Discoverer:
     def __init__(self, indexer, tags=frozenset()):
         self._indexer = indexer
         self._tags = tags
-        self._matches = matches = indexer.filter(tags)
+        self._objects = objects = indexer.filter(tags)
 
         try:
-            self._result = indexer.get(tags, results=matches)
-        except IndexerError as exc:
-            self._result = None
+            self._obj = indexer.get(tags, results=objects)
+        except DiscoveryError as exc:
+            self._obj = None
             self._error = exc
         else:
             self._error = None
@@ -87,13 +87,13 @@ class Discoverer:
 
     def __call__(self):
         if self._error is None:
-            return self._result
+            return self._obj
         else:
             raise self._error
 
     def __repr__(self):
         if self._error is None:
-            return f"Use () to retrieve {self._result!r}"
+            return f"Use () to retrieve {self._obj!r}"
         else:
             return str(self._error)
 
