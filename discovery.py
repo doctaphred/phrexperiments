@@ -39,17 +39,24 @@ class Indexer:
             obj_tags.add(name)
             self._tag_index[name].add(obj)
 
-    def filter(self, tags):
-        objects = set(self._obj_index)
+    def filtered_objects(self, tags):
+        remaining = set(self._obj_index)
         for tag in tags:
-            objects &= self._tag_index[tag]
-        return objects
+            # TODO: if not remaining: break?
+            remaining &= self._tag_index[tag]
+        return remaining
 
-    def filter2(self, tags):
+    def filtered_objects2(self, tags):
         return {
             obj for obj, obj_tags in self._obj_index.items()
             if obj_tags >= tags
         }
+
+    def filtered_tags(self, tags):
+        remaining = set()
+        for obj in self.filtered_objects(tags):
+            remaining.update(self._obj_index[obj])
+        return remaining - tags
 
 
 class Discoverer:
@@ -67,14 +74,14 @@ class Discoverer:
         return filtered
 
     def __dir__(self):
-        tags = self._indexer._tag_index.keys() - self._tags
+        tags = self._indexer.filtered_tags(self._tags)
         # TODO: Find a better way to make chained tab completion work
         for tag in tags:
             getattr(self, tag)
         return tags
 
     def __call__(self):
-        objects = self._indexer.filter(self._tags)
+        objects = self._indexer.filtered_objects(self._tags)
         if not objects:
             raise NoResults(self._tags)
         elif len(objects) == 1:
