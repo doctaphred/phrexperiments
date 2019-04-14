@@ -59,13 +59,19 @@ class Discoverer:
         self._tags = tags
 
     def __getattr__(self, name):
-        return type(self)(
+        filtered = type(self)(
             indexer=self._indexer,
             tags=self._tags | {name},
         )
+        setattr(self, name, filtered)
+        return filtered
 
     def __dir__(self):
-        return self._indexer._tag_index.keys() - self._tags
+        tags = self._indexer._tag_index.keys() - self._tags
+        # TODO: Find a better way to make chained tab completion work
+        for tag in tags:
+            getattr(self, tag)
+        return tags
 
     def __call__(self):
         objects = self._indexer.filter(self._tags)
