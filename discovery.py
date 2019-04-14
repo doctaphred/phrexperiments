@@ -75,6 +75,7 @@ class Discoverer:
         )
         setattr(self, name, filtered)
         return filtered
+        # TODO: fail for empty result sets
 
     def __dir__(self):
         tags = self._indexer.filtered_tags(self._tags)
@@ -82,6 +83,8 @@ class Discoverer:
         for tag in tags:
             getattr(self, tag)
         return tags
+        # TODO: Make chained tab completion always work (currently fails
+        # unless each attr is tab completed individually at least once)
 
     def __call__(self):
         objects = self._indexer.filtered_objects(self._tags)
