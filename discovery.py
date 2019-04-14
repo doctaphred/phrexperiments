@@ -97,24 +97,24 @@ if __name__ == '__main__':
         'add': {'math', 'binary'},
         'subtract': {'math', 'binary'},
         'multiply': {'math', 'binary'},
-        'divide': {'math', 'binary'},
         'logaddexp': {'math', 'binary'},
         'logaddexp2': {'math', 'binary'},
-        'true_divide': {'math', 'binary'},
+        'true_divide': {'math', 'binary', 'divide'},
         'floor_divide': {'math', 'binary'},
+        'matmul': {'math', 'binary'},
         'negative': {'math', 'binary'},
         'positive': {'math', 'binary'},
         'power': {'math', 'binary'},
-        'remainder': {'math', 'binary'},
-        'mod': {'math', 'binary'},
+        'float_power': {'math', 'binary', 'floating'},
+        'remainder': {'math', 'binary', 'mod'},
         'fmod': {'math', 'binary', 'floating'},
         'divmod': {'math', 'binary'},
-        'absolute': {'math', 'unary'},
+        'absolute': {'math', 'unary', 'abs'},
         'fabs': {'math', 'unary', 'floating'},
         'rint': {'math', 'unary'},
         'sign': {'math', 'unary'},
         'heaviside': {'math', 'binary'},
-        'conj': {'math', 'unary'},
+        'conjugate': {'math', 'unary', 'conj'},
         'exp': {'math', 'unary'},
         'exp2': {'math', 'unary'},
         'log': {'math', 'unary'},
@@ -146,12 +146,14 @@ if __name__ == '__main__':
         'arctanh': {'trig', 'unary', 'inverse', 'hyperbolic'},
         'deg2rad': {'trig', 'unary'},
         'rad2deg': {'trig', 'unary'},
+        'radians': {'trig', 'unary'},
+        'degrees': {'trig', 'unary'},
 
         # Bit-twiddling functions
         'bitwise_and': {'bitwise', 'binary'},
         'bitwise_or': {'bitwise', 'binary'},
         'bitwise_xor': {'bitwise', 'binary'},
-        'invert': {'bitwise', 'unary'},
+        'invert': {'bitwise', 'unary', 'bitwise_not'},
         'left_shift': {'bitwise', 'binary'},
         'right_shift': {'bitwise', 'binary'},
 
@@ -176,7 +178,6 @@ if __name__ == '__main__':
         'isinf': {'floating', 'unary'},
         'isnan': {'floating', 'unary'},
         'isnat': {'floating', 'unary'},
-        # 'fabs': {'floating', 'unary'},  # Duplicated in 'Math operations'
         'signbit': {'floating', 'unary'},
         'copysign': {'floating', 'binary'},
         'nextafter': {'floating', 'binary'},
@@ -184,58 +185,59 @@ if __name__ == '__main__':
         'modf': {'floating', 'unary'},
         'ldexp': {'floating', 'binary'},
         'frexp': {'floating', 'unary'},
-        # 'fmod': {'floating', 'binary'},  # Duplicated in 'Math operations'
         'floor': {'floating', 'unary'},
         'ceil': {'floating', 'unary'},
         'trunc': {'floating', 'unary'},
+
+        # "DO NOT USE, ONLY FOR TESTING"
+        '_arg': set(),
     }
 
-    for name, tags in ufunc_tags.items():
-        ufuncs_indexer.index(getattr(np, name), tags=tags)
-
-    assert ufuncs.bitwise.unary() is np.invert
-    assert ufuncs.unary.bitwise() is np.invert
-    assert ufuncs.invert() is np.invert
-
-    assert ufuncs.math.floating.binary() is np.fmod
-    assert ufuncs.math.binary.floating() is np.fmod
-    assert ufuncs.floating.math.binary() is np.fmod
-    assert ufuncs.binary.math.floating() is np.fmod
-    assert ufuncs.floating.binary.math() is np.fmod
-    assert ufuncs.binary.floating.math() is np.fmod
-    assert ufuncs.fmod() is np.fmod
-
-    extra_attrs = dir(ufuncs) - ufunc_tags.keys()
-    missing_funcs = ufunc_tags.keys() - dir(ufuncs)
-
-    assert extra_attrs == {
+    category_tags = {
         'binary',
         'bitwise',
         'comparison',
-        'conjugate',  # True name of conj
         'floating',
         'hyperbolic',
         'inverse',
         'math',
         'trig',
         'unary',
-    }, extra_attrs
+    }
 
-    # TODO: Handle aliases better
-    assert missing_funcs == {
-        'conj',  # alias of 'conjugate'
-        'divide',  # alias of 'true_divide'
-        'mod',  # alias of 'remainder'
-    }, missing_funcs
+    alias_tags = {
+        'abs',
+        'bitwise_not',
+        'conj',
+        'divide',
+        'mod',
+    }
 
-    # for name in dir(np):
-    #     obj = getattr(np, name)
-    #     if isinstance(obj, np.ufunc) and name != obj.__name__:
-    #         print(name, obj)
+    for name, tags in ufunc_tags.items():
+        ufuncs_indexer.index(getattr(np, name), tags=tags)
 
-    # Prints:
-    #     abs <ufunc 'absolute'>
-    #     bitwise_not <ufunc 'invert'>
-    #     conj <ufunc 'conjugate'>
-    #     divide <ufunc 'true_divide'>
-    #     mod <ufunc 'remainder'>
+    assert ufuncs.invert() is np.invert
+    assert ufuncs.unary.invert() is np.invert
+    assert ufuncs.bitwise.invert() is np.invert
+    assert ufuncs.bitwise.unary() is np.invert
+    assert ufuncs.unary.bitwise() is np.invert
+    assert ufuncs.invert.bitwise.unary() is np.invert
+    assert ufuncs.bitwise.invert.unary() is np.invert
+    assert ufuncs.bitwise.unary.invert() is np.invert
+    assert ufuncs.invert.unary.bitwise() is np.invert
+    assert ufuncs.unary.invert.bitwise() is np.invert
+    assert ufuncs.unary.bitwise.invert() is np.invert
+
+    extra_attrs = dir(ufuncs) - ufunc_tags.keys()
+    assert extra_attrs == category_tags | alias_tags
+
+    missing_attrs = ufunc_tags.keys() - dir(ufuncs)
+    assert not missing_attrs
+
+    all_ufuncs = {
+        name for name in dir(np)
+        if isinstance(getattr(np, name), np.ufunc)
+    }
+    missing_ufuncs = all_ufuncs - ufunc_tags.keys() - alias_tags
+    assert not missing_ufuncs
+    assert all_ufuncs == ufunc_tags.keys() | alias_tags
