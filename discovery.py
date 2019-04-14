@@ -232,6 +232,8 @@ if __name__ == '__main__':
     assert ufuncs.invert() is np.invert
     assert ufuncs.unary.invert() is np.invert
     assert ufuncs.bitwise.invert() is np.invert
+    assert ufuncs.invert.unary() is np.invert
+    assert ufuncs.invert.bitwise() is np.invert
     assert ufuncs.bitwise.unary() is np.invert
     assert ufuncs.unary.bitwise() is np.invert
     assert ufuncs.invert.bitwise.unary() is np.invert
