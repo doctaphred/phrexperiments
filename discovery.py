@@ -1,3 +1,4 @@
+from warnings import warn
 from collections import defaultdict
 
 
@@ -66,6 +67,8 @@ class Discoverer:
         self._tags = tags
 
     def __getattr__(self, name):
+        if name in self._tags:
+            warn(f"Redundant tag: {name!r}")
         filtered = type(self)(
             indexer=self._indexer,
             tags=self._tags | {name},
