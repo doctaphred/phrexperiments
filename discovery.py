@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+
 class DiscoveryError(LookupError):
     pass
 
@@ -18,15 +21,15 @@ class MultipleResults(DiscoveryError):
 class Indexer:
 
     def __init__(self):
-        self._obj_index = {}
-        self._tag_index = {}
+        self._obj_index = defaultdict(set)
+        self._tag_index = defaultdict(set)
 
     def index(self, obj, tags):
-        obj_tags = self._obj_index.setdefault(obj, set())
+        obj_tags = self._obj_index[obj]
 
         for tag in tags:
             obj_tags.add(tag)
-            self._tag_index.setdefault(tag, set()).add(obj)
+            self._tag_index[tag].add(obj)
 
         try:
             name = obj.__name__
@@ -34,7 +37,7 @@ class Indexer:
             pass
         else:
             obj_tags.add(name)
-            self._tag_index.setdefault(name, set()).add(obj)
+            self._tag_index[name].add(obj)
 
     def filter(self, tags):
         objects = set(self._obj_index)
