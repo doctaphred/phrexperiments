@@ -1,18 +1,15 @@
 """Don't try this at home."""
-import time
 from subprocess import run
 from importlib import import_module
 
 
 def autoimport(name, otherwise=Exception):
     print(f"Couldn't find {name}. You probably just forgot to import it!")
-    time.sleep(2)
     try:
         obj = import_module(name)
     except ModuleNotFoundError:
         print(f"Hm, don't see any modules named '{name}'.")
         print(f"You must have forgotten to install it! Let's fix that...")
-        time.sleep(4)
         try:
             run(['pip', 'install', name], check=True)
             obj = import_module(name)

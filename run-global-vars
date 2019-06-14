@@ -1,0 +1,5 @@
+#!/usr/bin/env bash -euo pipefail
+
+python global_vars.py
+python -m global_vars
+python -c 'import global_vars'
