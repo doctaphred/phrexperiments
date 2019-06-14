@@ -50,6 +50,11 @@ class AutoImportMeta(type):
         return autoimport(name, AttributeError(name))
 
 
+class _(metaclass=AutoImportMeta):
+    if sys.argv[1:2] != ['--i-understand-the-consequences-of-my-actions']:
+        exit("You don't understand the consequences of your actions.")
+
+
 if __name__ == '__main__':
     url = (
         'https://'
@@ -58,10 +63,6 @@ if __name__ == '__main__':
     )
 
     class packages(metaclass=AutoImportMeta):
-
-        if sys.argv[1:2] != ['--i-understand-the-consequences-of-my-actions']:
-            exit("You don't understand the consequences of your actions.")
-
         print(requests.get(url).text)
 
     expected = '😘😗😥😹😈😆😱😭😘😖😼💩'
