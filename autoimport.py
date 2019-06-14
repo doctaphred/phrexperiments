@@ -10,7 +10,7 @@ def autoimport(name, otherwise=Exception):
     try:
         obj = import_module(name)
     except ModuleNotFoundError:
-        print(f"Hm, don't see nay modules named '{name}'.")
+        print(f"Hm, don't see any modules named '{name}'.")
         print(f"You must have forgotten to install it! Let's fix that...")
         time.sleep(4)
         try:
