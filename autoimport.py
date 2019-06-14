@@ -52,7 +52,13 @@ class AutoImportMeta(type):
 
 class _(metaclass=AutoImportMeta):
     if sys.argv[1:2] != ['--i-understand-the-consequences-of-my-actions']:
-        exit("You don't understand the consequences of your actions.")
+        var = os.environ.get('I_UNDERSTAND_THE_CONSEQUENCES_OF_MY_ACTIONS')
+        try:
+            understood = ast.literal_eval(var)
+        except Exception:
+            understood = False
+        if not understood:
+            exit("You don't understand the consequences of your actions.")
 
 
 if __name__ == '__main__':
