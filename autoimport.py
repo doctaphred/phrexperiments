@@ -51,14 +51,18 @@ class AutoImportMeta(type):
 
 
 if __name__ == '__main__':
-    url = 'https://raw.githubusercontent.com/doctaphred/emojencode/master/LICENSE'  # noqa
+    url = (
+        'https://'
+        'raw.githubusercontent.com'
+        '/doctaphred/emojencode/master/LICENSE'
+    )
 
     class packages(metaclass=AutoImportMeta):
 
-        if sys.argv[1:2] != ['--i-understand-the-consequences-of-my-actions']:  # noqa
+        if sys.argv[1:2] != ['--i-understand-the-consequences-of-my-actions']:
             exit("You don't understand the consequences of your actions.")
 
-        print(requests.get(url).text)  # noqa: F821 undefined name
+        print(requests.get(url).text)
 
     expected = '😘😗😥😹😈😆😱😭😘😖😼💩'
     result = packages.emojencode.e64encode(b'ayy lmao')
