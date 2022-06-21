@@ -4,21 +4,42 @@
 #
 #    pip-compile 
 #
-appnope==0.1.0            # via ipython
-backcall==0.1.0           # via ipython
-click==7.0                # via pip-tools
-decorator==4.4.0          # via ipython, traitlets
-ipython-genutils==0.2.0   # via traitlets
+backcall==0.1.0
+    # via ipython
+click==7.0
+    # via pip-tools
+decorator==4.4.0
+    # via
+    #   ipython
+    #   traitlets
 ipython==7.4.0
-jedi==0.13.3              # via ipython
-numpy==1.16.2
-parso==0.4.0              # via jedi
-pexpect==4.7.0            # via ipython
-pickleshare==0.7.5        # via ipython
+    # via -r requirements.in
+ipython-genutils==0.2.0
+    # via traitlets
+jedi==0.13.3
+    # via ipython
+numpy==1.22.0
+    # via -r requirements.in
+parso==0.4.0
+    # via jedi
+pexpect==4.7.0
+    # via ipython
+pickleshare==0.7.5
+    # via ipython
 pip-tools==3.6.0
-prompt-toolkit==2.0.9     # via ipython
-ptyprocess==0.6.0         # via pexpect
-pygments==2.3.1           # via ipython
-six==1.12.0               # via pip-tools, prompt-toolkit, traitlets
-traitlets==4.3.2          # via ipython
-wcwidth==0.1.7            # via prompt-toolkit
+    # via -r requirements.in
+prompt-toolkit==2.0.9
+    # via ipython
+ptyprocess==0.6.0
+    # via pexpect
+pygments==2.3.1
+    # via ipython
+six==1.12.0
+    # via
+    #   pip-tools
+    #   prompt-toolkit
+    #   traitlets
+traitlets==4.3.2
+    # via ipython
+wcwidth==0.1.7
+    # via prompt-toolkit
